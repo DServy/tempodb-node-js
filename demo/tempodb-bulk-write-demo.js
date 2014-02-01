@@ -12,7 +12,7 @@ var data = [
     { key: "custom-series-key4", v: 4.44 },
 ];
 
-tempodb.write_bulk(ts, data, function(result){
+tempodb.writeBulk(ts, data, function(result){
     var out = result.response;
     if (result.body) {
         out += ': ' + JSON.stringify(result.body);

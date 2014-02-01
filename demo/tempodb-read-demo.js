@@ -16,7 +16,7 @@ var options = {
 var count = 0
 
 var start_time = new Date();
-tempodb.read(series_key, series_start_date, series_end_date, options, function(err, result){
+tempodb.read(seriesKey, seriesStartDate, seriesEndDate, options, function(err, result){
 	if (err) {
 		//console.log('Response code: ' + result.status);
 		//console.log('Error reason: ' + result.json);

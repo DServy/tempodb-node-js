@@ -22,7 +22,7 @@ for (var day = 0; day < 10; day++) {
 
     console.log(day, data[0]);
 
-    tempodb.write_key(series_key, data, function(err, result){
+    tempodb.writeKey(seriesKey, data, function(err, result){
         var out = result.status;
         if (result.json) {
             out += ': ' + JSON.stringify(result.json);
