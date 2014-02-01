@@ -59,7 +59,7 @@ Most of the API functions allow you to pass in an optional *callback* function. 
 
 However, You can supply a second argument to the callback function that will capture any errors with the call. This error object will contain the standard node.js HTTP library error objects. An example of this usage.
 
-    tempodb.read_key(series_key, series_start_date, series_end_date, options, function(result, error) {
+    tempodb.readKey(seriesKey, seriesStartDate, seriesEndDate, options, function(result, error) {
       if(error) throw error;
       // Do something with result.
     });
@@ -67,7 +67,7 @@ However, You can supply a second argument to the callback function that will cap
 
 The return types below show what is returned in the *body* parameter of successful calls.
 
-## TempoDBClient#create_series(*key*, *callback*)
+## TempoDBClient#createSeries(*key*, *callback*)
 Creates a new series with an optionally specified key.  If no key is given, only the system generated id is returned.
 
 ### Parameters
@@ -94,20 +94,20 @@ The following example creates two series: one with a given key of "my-custom-key
 
     var series1, series2;
 
-    tempodb.create_series('my-custom-key'), function(result) {
+    tempodb.createSeries('my-custom-key'), function(result) {
         if (result.response == 200) {
             series1 = result.body;
         }
     });
 
-    tempodb.create_series(null, function(result) {
+    tempodb.createSeries(null, function(result) {
         if (result.response == 200) {
             series2 = result.body;
         }
     });
 
 
-## TempoDBClient#get_series(*options*, *callback*)
+## TempoDBClient#getSeries(*options*, *callback*)
 Gets a list of series objects, optionally filtered by the provided parameters. Series can be filtered by id, key, tag and
 attribute.
 
@@ -154,7 +154,7 @@ The following example returns all series with tags "tag1" and "tag2" and attribu
         attr: { attr1: 'value1'}
     }
 
-    tempodb.get_series(options, function(result){
+    tempodb.getSeries(options, function(result){
         if (result.response == 200) {
             var series_list = result.body;
 
@@ -166,13 +166,13 @@ The following example returns all series with tags "tag1" and "tag2" and attribu
     });
 
 
-## TempoDBClient#update_series(*series_id*, *series_key*, *name*, *attributes*, *tags*, *callback*)
+## TempoDBClient#updateSeries(*seriesId*, *seriesKey*, *name*, *attributes*, *tags*, *callback*)
 Updates a series.  Currently, only tags and attributes can be modified. The easiest way to use this method is through a read-modify-write cycle.
 
 ### Parameters
 
-* series_id - id for the series (string)
-* series_key - key for the series (string)
+* seriesId - id for the series (string)
+* seriesKey - key for the series (string)
 * name - name of the series (string)
 * attributes - an object of attribute key/value pairs (object)
 * tags - an array of tags (array of strings)
@@ -184,7 +184,7 @@ The updated series object
       "id":"92a81e6936c24274b6bb53c57004afce",
       "key":"test1",
       "name":"",
-      "attributes":{unit: 'Fahrenheit', user_id: 27},
+      "attributes":{unit: 'Fahrenheit', userId: 27},
       "tags":['foo', 'bar']
     }
 
@@ -200,18 +200,18 @@ The following example reads the list of series with key *test1* (should only be 
         key: 'test1'
     }
 
-    tempodb.get_series(options, function(result) {
+    tempodb.getSeries(options, function(result) {
         if (result.response == 200) {
             var series = result.body[0];
             var new_tags = ['foo', 'bar'];
-            var new_attr = {unit: 'Fahrenheit', user_id: 27};
-            tempodb.update_series(series.id, series.key, series.name, new_attr, new_tags, cb);
+            var new_attr = {unit: 'Fahrenheit', userId: 27};
+            tempodb.updateSeries(series.id, series.key, series.name, new_attr, new_tags, cb);
         }
     });
 
-## TempoDBClient#delete_series(*options*, callback)
+## TempoDBClient#deleteSeries(*options*, callback)
 Delete series objects by the given filter criteria.
-This method has the same query parameters as `get_series`. Series can be
+This method has the same query parameters as `getSeries`. Series can be
 deleted by id, key, tag and attribute. You must specify at least one filter
 query param for deletion. If you want to truncate your database (remove all
 series), you must specify `allow_truncation: true`.
@@ -246,7 +246,7 @@ The following example deletes all series with "tag1" and "tag2" and attribute "a
       }
     };
 
-    tempodb.delete_series(options, cb);
+    tempodb.deleteSeries(options, cb);
 
 ## TempoDBClient#read(*start*, *end*, *options*, *callback*)
 Gets one or more series and corresponding time series data between the specified start and end dates.  The optional interval parameter allows you to specify a rollup period. For example, "1hour" will roll the data up on the hour using the provided function. The function parameter specifies the folding function to use while rolling the data up. A rollup is selected automatically if no interval or function is given. The auto rollup interval is calculated by the total time range (end - start) as follows:
@@ -366,18 +366,18 @@ The following example reads the list of series with key *your-custom-key* (shoul
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
     var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series_key = 'your-custom-key';
-    series_start_date = new Date('2012-01-01');
-    series_end_date = new Date('2012-01-02');
+    var seriesKey = 'your-custom-key';
+    seriesStartDate = new Date('2012-01-01');
+    seriesEndDate = new Date('2012-01-02');
 
     var options = {
-        key: series_key,
+        key: seriesKey,
         interval: '1hour',
         'function': 'mean',
         tz: 'America/Chicago'
     }
 
-    tempodb.read(series_start_date, series_end_date, options, function(result){
+    tempodb.read(seriesStartDate, seriesEndDate, options, function(result){
         for (var i = 0; i < result.body.length; i++) {
             var series = result.body[i];
             console.log(series);
@@ -385,12 +385,12 @@ The following example reads the list of series with key *your-custom-key* (shoul
     });
 
 
-## TempoDBClient#read_id(*series_id*, *start*, *end*, *options*, *callback*)
+## TempoDBClient#readId(*seriesId*, *start*, *end*, *options*, *callback*)
 Gets a single series by id and corresponding time series data between the specified start and end dates.  The same rollup rules apply as with the read() function above.
 
 ### Parameters
 
-* series_id - id for the series to read from (string)
+* seriesId - id for the series to read from (string)
 * start - start time for the query (Date)
 * end - end time for the query (Date)
 
@@ -452,9 +452,9 @@ The following example reads data for the series with id *6fefeba655504694b21235a
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
     var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series_id = '6fefeba655504694b21235acf8cdae5f';
-    series_start_date = new Date('2012-01-01');
-    series_end_date = new Date('2012-01-14');
+    var seriesId = '6fefeba655504694b21235acf8cdae5f';
+    seriesStartDate = new Date('2012-01-01');
+    seriesEndDate = new Date('2012-01-14');
 
     var options = {
         interval: '1day',
@@ -462,15 +462,15 @@ The following example reads data for the series with id *6fefeba655504694b21235a
         tz: 'America/Chicago'
     }
 
-    tempodb.read_id(series_id, series_start_date, series_end_date, options, cb);
+    tempodb.readId(seriesId, seriesStartDate, seriesEndDate, options, cb);
 
 
-## TempoDBClient#read_key(*series_key*, *start*, *end*, *options*, *callback*)
+## TempoDBClient#readKey(*seriesKey*, *start*, *end*, *options*, *callback*)
 Gets a single series by key and corresponding time series data between the specified start and end dates.  The same rollup rules apply as with the read() function above.
 
 ### Parameters
 
-* series_key - key for the series to read from (string)
+* seriesKey - key for the series to read from (string)
 * start - start time for the query (Date)
 * end - end time for the query (Date)
 
@@ -532,9 +532,9 @@ The following example reads data for the series with id *your-custom-key* and re
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
     var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series_key = 'your-custom-key';
-    series_start_date = new Date('2012-01-01');
-    series_end_date = new Date('2012-01-14');
+    var seriesKey = 'your-custom-key';
+    seriesStartDate = new Date('2012-01-01');
+    seriesEndDate = new Date('2012-01-14');
 
     var options = {
         interval: '1day',
@@ -542,15 +542,15 @@ The following example reads data for the series with id *your-custom-key* and re
         tz: 'America/Chicago'
     }
 
-    tempodb.read_key(series_key, series_start_date, series_end_date, options, cb);
+    tempodb.readKey(seriesKey, seriesStartDate, seriesEndDate, options, cb);
 
 
-## TempoDBClient#single_value_by_id(*series_id*, *ts*, *options*, *callback*)
+## TempoDBClient#singleValueById(*seriesId*, *ts*, *options*, *callback*)
 Requests a single value for the series specified by id. This will return a datapoint exactly determined by the supplied timestamp (ts) or this function can also search for datapoints.
 
 ### Parameters
 
-* series_id - id for the series to retrieve single value (string)
+* seriesId - id for the series to retrieve single value (string)
 * ts - the requested timestamp for a datapoint. (DateTime)
 * options - An object containing the following
     * direction - the specified search direction (string). Options are:
@@ -582,22 +582,22 @@ Note: the data field will be null if no datapoint was found.
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
     var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series_id = '6fefeba655504694b21235acf8cdae5f';
+    var seriesId = '6fefeba655504694b21235acf8cdae5f';
     var ts = new Date('2012-01-01');
 
     var options = {
         direction: 'nearest'
     }
 
-    tempodb.single_value_by_id(series_id, ts, options, cb);
+    tempodb.singleValueById(seriesId, ts, options, cb);
 
 
-## TempoDBClient#single_value_by_key(*series_key*, *ts*, *options*, *callback*)
+## TempoDBClient#singleValueByKey(*seriesKey*, *ts*, *options*, *callback*)
 Requests a single value for the series specified by key. This will return a datapoint exactly determined by the supplied timestamp (ts) or this function can also search for datapoints.
 
 ### Parameters
 
-* series_key - key for the series to retrieve single value (string)
+* seriesKey - key for the series to retrieve single value (string)
 * ts - the requested timestamp for a datapoint. (DateTime)
 * options - An object containing the following
     * direction - the specified search direction (string). Options are:
@@ -629,14 +629,14 @@ Note: the data field will be null if no datapoint was found.
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
     var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series_key = 'your-custom-key';
+    var seriesKey = 'your-custom-key';
     var ts = new Date('2012-01-01');
 
     var options = {
         direction: 'before'
     }
 
-    tempodb.single_value_by_key(series_key, ts, options, cb);
+    tempodb.singleValueByKey(seriesKey, ts, options, cb);
 
 
 ## TempoDBClient#single_value(*ts*, *options*, *callback*)
@@ -700,12 +700,12 @@ This example will return a list of single value responses for all series with bo
     tempodb.single_value(ts, options, cb);
 
 
-## TempoDBClient#write_id(*series_id*, *data*, *callback*)
+## TempoDBClient#writeId(*seriesId*, *data*, *callback*)
 Write datapoints to the specified series id.
 
 ### Parameters
 
-* series_id - id for the series to write to (string)
+* seriesId - id for the series to write to (string)
 * data - the data to write (Array of {t, v} Objects)
 
 ### Returns
@@ -720,7 +720,7 @@ The following example writes three datapoints to the series with id *6fefeba6555
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
     var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series_id = '6fefeba655504694b21235acf8cdae5f';
+    var seriesId = '6fefeba655504694b21235acf8cdae5f';
 
     var data = [
         { t: new Date("2012-01-12 14:11:00"), v: 55.231 },
@@ -728,15 +728,15 @@ The following example writes three datapoints to the series with id *6fefeba6555
         { t: new Date("2012-01-12 14:13:00"), v: 49.856 }
     ];
 
-    tempodb.write_id(series_id, data, cb);
+    tempodb.writeId(seriesId, data, cb);
 
 
-## TempoDBClient#write_key(*series_key*, *data*, *callback*)
+## TempoDBClient#writeKey(*seriesKey*, *data*, *callback*)
 Write datapoints to the specified series key.
 
 ### Parameters
 
-* series_key - key for the series to write to (string)
+* seriesKey - key for the series to write to (string)
 * data - the data to write (Array of {t, v} Objects)
 
 ### Returns
@@ -751,7 +751,7 @@ The following example writes three datapoints to the series with key *your-custo
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
     var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series_key = 'your-custom-key';
+    var seriesKey = 'your-custom-key';
 
     var data = [
         { t: new Date("2012-01-12 14:11:00"), v: 55.231 },
@@ -759,7 +759,7 @@ The following example writes three datapoints to the series with key *your-custo
         { t: new Date("2012-01-12 14:13:00"), v: 49.856 }
     ];
 
-    tempodb.write_key(series_key, data, cb);
+    tempodb.writeKey(seriesKey, data, cb);
 
 
 ## TempoDBClient#write_bulk(*ts*, *data*, *callback*)
@@ -862,12 +862,12 @@ The following example writes 5 separate series at the same timestamp.
     tempodb.write_multi(data, cb);
 
 
-## TempoDBClient#increment_id(*series_id*, *data*, *callback*)
+## TempoDBClient#incrementId(*seriesId*, *data*, *callback*)
 Increments the value of the specified series id at the given timestamp. The value of the datapoint is the amount to increment (can be a positive or negative value). This is similar to a write, however the value is incremented by the datapoint value instead of overwritten. Values are incremented atomically, so this is useful for counting events.
 
 ### Parameters
 
-* series_id - id for the series to increment (string)
+* seriesId - id for the series to increment (string)
 * data - the data to write (Array of {t, v} Objects)
 
 ### Returns
@@ -882,7 +882,7 @@ The following example writes three datapoints to the series with id *6fefeba6555
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
     var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series_id = '6fefeba655504694b21235acf8cdae5f';
+    var seriesId = '6fefeba655504694b21235acf8cdae5f';
 
     var data = [
         { t: new Date("2012-01-12 14:11:00"), v: 1 },
@@ -890,15 +890,15 @@ The following example writes three datapoints to the series with id *6fefeba6555
         { t: new Date("2012-01-12 14:13:00"), v: -3 }
     ];
 
-    tempodb.increment_id(series_id, data, cb);
+    tempodb.incrementId(seriesId, data, cb);
 
 
-## TempoDBClient#increment_key(*series_key*, *data*, *callback*)
+## TempoDBClient#incrementKey(*seriesKey*, *data*, *callback*)
 Increments the value of the specified series key at the given timestamp. The value of the datapoint is the amount to increment (can be a positive or negative value). This is similar to a write, however the value is incremented by the datapoint value instead of overwritten. Values are incremented atomically, so this is useful for counting events.  Note: a series will be created if the provided key does not exist.
 
 ### Parameters
 
-* series_key - key for the series to write to (string)
+* seriesKey - key for the series to write to (string)
 * data - the data to write (Array of {t, v} Objects)
 
 ### Returns
@@ -913,7 +913,7 @@ The following example writes three datapoints to the series with key *your-custo
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
     var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series_key = 'your-custom-key';
+    var seriesKey = 'your-custom-key';
 
     var data = [
         { t: new Date("2012-01-12 14:11:00"), v: 55.231 },
@@ -921,7 +921,7 @@ The following example writes three datapoints to the series with key *your-custo
         { t: new Date("2012-01-12 14:13:00"), v: 49.856 }
     ];
 
-    tempodb.increment_key(series_key, data, cb);
+    tempodb.incrementKey(seriesKey, data, cb);
 
 
 ## TempoDBClient#increment_bulk(*ts*, *data*, *callback*)
@@ -1023,12 +1023,12 @@ The following example increments 5 separate series at the same timestamp.
     tempodb.increment_multi(data, cb);
 
 
-## TempoDBClient#delete_id(*series_id*, *start*, *end*, *callback*)
+## TempoDBClient#deleteId(*seriesId*, *start*, *end*, *callback*)
 Deletes a range of data for a series referenced by id between the specified start and end dates. As with the read api, the start date is inclusive and the end date is exclusive. i.e. \[start, end)
 
 ### Parameters
 
-* series_id - id for the series to delete from (string)
+* seriesId - id for the series to delete from (string)
 * start - start time for the query (Date, inclusive)
 * end - end time for the query (Date, exclusive)
 
@@ -1044,19 +1044,19 @@ The following example deletes data for the series with id *6fefeba655504694b2123
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
     var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series_id = '6fefeba655504694b21235acf8cdae5f';
-    series_start_date = new Date('2012-01-01');
-    series_end_date = new Date('2012-01-14');
+    var seriesId = '6fefeba655504694b21235acf8cdae5f';
+    seriesStartDate = new Date('2012-01-01');
+    seriesEndDate = new Date('2012-01-14');
 
-    tempodb.delete_id(series_id, series_start_date, series_end_date, cb);
+    tempodb.deleteId(seriesId, seriesStartDate, seriesEndDate, cb);
 
 
-## TempoDBClient#delete_key(*series_key*, *start*, *end*, *callback*)
+## TempoDBClient#deleteKey(*seriesKey*, *start*, *end*, *callback*)
 Deletes a range of data from a series referenced by key between the specified start and end dates. As with the read api, the start is inclusive and the end date is exclusive. \[start, end)
 
 ### Parameters
 
-* series_key - key for the series to delete from (string)
+* seriesKey - key for the series to delete from (string)
 * start - start time for the query (Date, inclusive)
 * end - end time for the query (Date, exclusive)
 
@@ -1072,8 +1072,8 @@ The following example deletes data for the series with key *your-custom-key* bet
     var tempodb = new TempoDBClient('your-api-key', 'your-api-secret');
     var cb = function(result){ console.log(result.response+': '+ JSON.stringify(result.body)); }
 
-    var series_key = 'your-custom-key';
-    series_start_date = new Date('2012-01-01');
-    series_end_date = new Date('2012-01-14');
+    var seriesKey = 'your-custom-key';
+    seriesStartDate = new Date('2012-01-01');
+    seriesEndDate = new Date('2012-01-14');
 
-    tempodb.delete_key(series_key, series_start_date, series_end_date, cb);
+    tempodb.deleteKey(seriesKey, seriesStartDate, seriesEndDate, cb);
